@@ -1,7 +1,7 @@
 //подключение библиотек
 require("dotenv").config();
 const express = require("express");
-const modelDb = require("./config/mongoConfig");
+const db = require("./config/mongoConfig")();
 
 //установка константы значения порта
 const port = process.env.PORT || 3000;
