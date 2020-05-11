@@ -1,6 +1,6 @@
 //подключаем експресс и контроллер блога
 const express = require("express");
-const blogsController = require("../controllers/blogController");
+const blogsController = require("../controllers/blog");
 
 //устанавливаем роут блога
 const blogsRouter = express.Router();

@@ -6,6 +6,7 @@ const mongo = require('mongoose');
 mongo.set("useNewUrlParser", true);
 mongo.set("useNewUrlParser", true);
 mongo.set("useUnifiedTopology", true);
+mongo.set('useCreateIndex', true)
 
 
 //экспортируем функцию для работы с коллекциями

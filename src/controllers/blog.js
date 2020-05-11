@@ -1,12 +1,12 @@
 //подключаем модель блогов
-const blogs = require("../models/blogModel");
+const blogs = require("../models/blog");
 
 //колбек функции для блогов
 //============================
 //получить все блоги
 exports.getAll = (req, res) => {
     blogs.find()
-        .exec((err, newS) => {
+        .exec((err, blogs) => {
         if (err) throw err;
         res.send(blogs);
     });

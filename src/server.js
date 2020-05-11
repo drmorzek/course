@@ -4,7 +4,7 @@ const express  = require("express");
 const bodyparser = require("body-parser");
 
 //експорт роутов
-const blogsRouter = require("./routes/blogRouter");
+const blogsRouter = require("./routes/blog");
 
 //установка константы значения порта
 const port = process.env.PORT || 3000;
@@ -20,7 +20,8 @@ app.use(bodyparser.urlencoded({
 
 app.use("/blog", blogsRouter);
 
-
+//поключение к БД
+require("./config/mongo")();
 
 //запуск сервера на прослушку порта 
 app.listen(port, () => {

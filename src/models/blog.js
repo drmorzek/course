@@ -18,7 +18,8 @@ const blogSchema = {
 };
 
 //подключаем мангуста и устанавливаем схему
-const mongo = require("../config/mongoConfig")();
+const mongo = require("mongoose");
+const Schema = mongo.Schema;
 
 //экспорт модели
-module.exports = () => mongo.model("Blog", new Schema(blogSchema));
+module.exports = mongo.model("Blog", new Schema(blogSchema));
