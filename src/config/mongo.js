@@ -13,7 +13,7 @@ mongo.set('useCreateIndex', true)
 module.exports = () => {
     mongo.connect(process.env.MONGO_URI).then(
       () => {
-        console.log("Соединение с базой успешно");
+        console.log("Соединение с базой данных успешно");
       },
       (err) => {
         console.log(err);
