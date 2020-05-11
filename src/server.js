@@ -3,7 +3,7 @@ require("dotenv").config();
 const express  = require("express");
 const bodyparser = require("body-parser");
 
-//експорт роутов
+//импорт роутов
 const blogsRouter = require("./routes/blog");
 
 //установка константы значения порта
@@ -23,6 +23,6 @@ app.use("/blog", blogsRouter);
 
 //запуск сервера на прослушку порта 
 app.listen(port, () => {
-    require("./config/mongo")();
+    require("./config/mongo")(); //подключение к БД
     console.log(`Сервер запустился на порту ${port}...`);
 });

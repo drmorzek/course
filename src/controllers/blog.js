@@ -6,9 +6,9 @@ const blogs = require("../models/blog");
 //получить все блоги
 exports.getAll = (req, res) => {
     blogs.find()
-        .exec((err, blogs) => {
+        .exec((err, data) => {
         if (err) throw err;
-        res.send(blogs);
+        res.send(data);
     });
 };
 
