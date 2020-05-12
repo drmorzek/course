@@ -19,19 +19,19 @@ const getAll = async (req, res) => {
 
 //получить блог по id
 const getOne = async (req, res) => {
-    if (isNaN(Number(req.params.id)) !== true) {
-        await blogs
-            .find({
-                id: Number(req.params.id),
-            })
-            .exec((err, data) => {
-                if (err) res.status(501).send(err);
-                if (data.length !== 0) {
-                    res.status(200).send(data);
-                } else {
-                    res.sendStatus(501);
-                }
-            });
+        if (isNaN(Number(req.params.id)) !== true) {
+            await blogs
+                .find({
+                    id: Number(req.params.id),
+                })
+                .exec((err, data) => {
+                    if (err) res.status(501).send(err);
+                    if (data.length !== 0) {
+                        res.status(200).send(data);
+                    } else {
+                        res.sendStatus(501);
+                    }
+                });
         } else {
             res.sendStatus(501);
         }
