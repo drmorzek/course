@@ -35,8 +35,7 @@ const getOne = async (req, res) => {
         } else {
             res.sendStatus(501);
         }
-    }
-    // if (req.params.id)
+    };
     
 
 module.exports = {
