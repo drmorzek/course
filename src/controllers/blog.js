@@ -9,7 +9,7 @@ const getAll = async (req, res) => {
         .find()
         .exec((err, data) => {
             if (err) throw err;
-            if (data !== []) {
+            if (data.length !== 0) {
                 res.status(200).send(data);
             } else {
                 res.sendStatus(501);
@@ -25,7 +25,7 @@ const getOne = async (req, res) => {
         })
         .exec((err, data) => {
             if (err) throw err;
-            if (data !== []) {
+            if (data.length !== 0) {
                 res.status(200).send(data);
             } else {
                 res.sendStatus(501);
@@ -36,4 +36,4 @@ const getOne = async (req, res) => {
 module.exports = {
     getAll,
     getOne
-}
+};
