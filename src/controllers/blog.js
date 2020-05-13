@@ -4,6 +4,9 @@ const blogs = require("../models/blog");
 //експорт редиски для кеширования
 const redis = require("../config/redis");
 
+//время жизни блога в кеше(в секундах)
+const expire = 60;
+
 //колбек функции для блогов
 //============================
 //получить все блоги
@@ -15,10 +18,10 @@ const getAll = async (req, res) => {
             if (data.length !== 0 ) {
                 data.forEach((value, index) =>{
                     console.log("В Redis записано ", String(value));
-                    redis.hmset(
-                      "blog_cache",
-                      String(value.id),
-                      JSON.stringify(value)
+                    redis.set(
+                      "blog_"+String(value.id),
+                      JSON.stringify(value),
+                      "EX", expire
                     );
                 });                
                 res.status(200).send(data);
@@ -31,11 +34,11 @@ const getAll = async (req, res) => {
 //получить блог по id
 const getOne = async (req, res) => {        
         if (!isNaN(Number(req.params.id))) {
-            redis.hmget("blog_cache", req.params.id, (err, res_cache) => {
+            redis.get("blog_"+req.params.id, (err, res_cache) => {
               if (err) res.status(501).send(err);
-              if (String(res_cache).length !== 0) {
-                console.log("Взято из Redis ", JSON.parse(res_cache[0]));
-                res.status(200).send(JSON.parse(res_cache[0]));
+              if (res_cache) {
+                console.log("Взято из Redis ", JSON.parse(res_cache));
+                res.status(200).send(JSON.parse(res_cache));
               } else {
                 blogs
                   .find({
@@ -44,13 +47,13 @@ const getOne = async (req, res) => {
                   .exec((err, data) => {
                     if (err) res.status(501).send(err);
                     if (data.length !== 0) {
-                      console.log("Взято из БД ", data[0]);
-                      redis.hmset(
-                        "blog_cache",
-                        String(req.params.id),
-                        JSON.stringify(data[0])
-                      );
-                      res.status(200).send(data[0]);
+                      console.log("Взято из БД ", data);
+                      redis.set(
+                        "blog_"+String(req.params.id),
+                        JSON.stringify(data),
+                        "EX", expire
+                      );                      
+                      res.status(200).send(data);
                     } else {
                       res.sendStatus(501);
                     }
