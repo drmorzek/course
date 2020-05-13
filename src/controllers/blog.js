@@ -34,7 +34,7 @@ const getAll = async (req, res) => {
 //получить блог по id
 const getOne = async (req, res) => {        
         if (!isNaN(Number(req.params.id))) {
-            redis.get("blog_"+req.params.id, (err, res_cache) => {
+           await redis.get("blog_"+req.params.id, (err, res_cache) => {
               if (err) res.status(501).send(err);
               if (res_cache) {
                 console.log("Взято из Redis ", JSON.parse(res_cache));
