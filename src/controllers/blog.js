@@ -34,8 +34,8 @@ const getOne = async (req, res) => {
             redis.hmget("blog_cache", req.params.id, (err, res_cache) => {
               if (err) res.status(501).send(err);
               if (String(res_cache).length !== 0) {
-                console.log("Взято из Redis ", JSON.parse(res_cache));
-                res.status(200).send(JSON.parse(res_cache));
+                console.log("Взято из Redis ", JSON.parse(res_cache[0]));
+                res.status(200).send(JSON.parse(res_cache[0]));
               } else {
                 blogs
                   .find({
@@ -44,13 +44,13 @@ const getOne = async (req, res) => {
                   .exec((err, data) => {
                     if (err) res.status(501).send(err);
                     if (data.length !== 0) {
-                      console.log("Взято из БД ", data);
+                      console.log("Взято из БД ", data[0]);
                       redis.hmset(
                         "blog_cache",
                         String(req.params.id),
-                        JSON.stringify(data)
+                        JSON.stringify(data[0])
                       );
-                      res.status(200).send(data);
+                      res.status(200).send(data[0]);
                     } else {
                       res.sendStatus(501);
                     }
