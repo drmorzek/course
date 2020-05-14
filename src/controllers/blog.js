@@ -67,7 +67,7 @@ module.exports.getOne = async (req, res) => {
 
                   // сервер возвращает 201 - если в редис сохранился блог
                   res.status(201).json({
-                    data: JSON.parse(blogFromRedis)
+                    data: [JSON.parse(blogFromRedis)]
                   });
 
                   //если в кеше блога нет, то..
@@ -91,12 +91,12 @@ module.exports.getOne = async (req, res) => {
                     //иначе, если блог в базе найден, то...
                   } else {
                     //для проверки в консоли
-                    console.log("Взято из MongoDB ", blogFromMongo);
+                    console.log("Взято из MongoDB и записано в Redis", blogFromMongo[0]);
 
                     //кешируем в редис если блог в базе найден
                     await redis.set(
                       "blog_" + String(req.params.id),
-                      JSON.stringify(blogFromMongo),
+                      JSON.stringify(blogFromMongo[0]),
                       "EX", expire
                     );
                     // сервер возвращает 201 - если все ок
