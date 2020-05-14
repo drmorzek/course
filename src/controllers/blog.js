@@ -1,5 +1,5 @@
 //подключаем модель блогов
-const blogs = require("../models/blog");
+const Blogs = require("../models/blog");
 
 //импорт редиски для кеширования
 const redis = require("../config/redis");
@@ -10,29 +10,32 @@ const expire = 60;
 //колбек функции для блогов
 //============================
 //получить все блоги
-const getAll = async (req, res) => {
-    await blogs
-        .find()
-        .exec((err, data) => {
-            if (err) throw err;
-            if (data.length !== 0 ) {
-                data.forEach((value, index) =>{
-                    console.log("В Redis записано ", String(value));
-                    redis.set(
+module.exports.getAll = async (req, res) => {
+    try{
+        const news = await Blogs.find({});
+        if(!news){
+            // 400 - новости не найдены
+            res.status(400).json({
+                message: 'fdfsdf'
+            });
+        } else {
+            news.forEach((value, index) =>{
+                redis.set(
                       "blog_"+String(value.id),
                       JSON.stringify(value),
                       "EX", expire
                     );
-                });                
-                res.status(200).send(data);
-            } else {
-                res.sendStatus(501);
-            }
-        });
+             });    
+            // 201 - все ок
+            res.status(201).json({
+                data: news
+            });
+        }
+    } catch(e) {
+        throw e
     };
-
 //получить блог по id
-const getOne = async (req, res) => {        
+module.exports.getOne = async (req, res) => {        
         if (!isNaN(Number(req.params.id))) {
            await redis.get("blog_"+req.params.id, (err, res_cache) => {
               if (err) res.status(501).send(err);
@@ -65,9 +68,3 @@ const getOne = async (req, res) => {
             res.sendStatus(501);
         }
     };
-    
-
-module.exports = {
-    getAll,
-    getOne
-};
