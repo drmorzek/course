@@ -23,7 +23,7 @@ module.exports.getAll = async (req, res) => {
 
                 } else {
                   //сохраняем полученные данные в редис
-                  blog.forEach((value, index) => {
+                  await blog.forEach((value, index) => {
                     //для проверки в консоли
                     console.log("В Redis записано ", String(value));
 
