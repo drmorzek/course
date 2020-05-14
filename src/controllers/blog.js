@@ -14,8 +14,7 @@ module.exports.getAll = async (req, res) => {
 
               try {
                 const blog = await Blogs.find({});
-                if (!blog) {
-
+                if (!blog[0]) {
                   // сервер возвращает 400 - если блоги не найдены
                   res.status(400).json({
                     message: 'Blogs not found from MongoDB'
@@ -78,8 +77,8 @@ module.exports.getOne = async (req, res) => {
                     id: Number(req.params.id),
                   });
 
-                  //если блог и в монго не найден
-                  if (blogFromMongo.length === 0) {
+                  //если блог и в монго не найден                
+                  if (!blogFromMongo[0]) {
 
                     //для проверки в консоли
                     console.log('Blogs not found in MongoDB and Redis');
