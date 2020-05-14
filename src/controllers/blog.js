@@ -24,7 +24,9 @@ module.exports.getAll = async (req, res) => {
                 } else {
                   //сохраняем полученные данные в редис
                   blog.forEach((value, index) => {
+                    //для проверки в консоли
                     console.log("В Redis записано ", String(value));
+
                     redis.set("blog_" + String(value.id), 
                     JSON.stringify(value), 
                     "EX", expire);
@@ -37,7 +39,9 @@ module.exports.getAll = async (req, res) => {
                 }
 
               } catch (e) {
-                throw e;
+                res.status(400).json({
+                  message: `Error: ${String(e)}`
+                });
               }
   };
 
@@ -53,7 +57,7 @@ module.exports.getOne = async (req, res) => {
 
               // 400 - если ошибка в редис
               if (err) res.status(400).json({
-                message: 'Blogs not found'
+                message: `Error from Redis: ${String(err)}`
               });
 
               if (blog_cache) {
@@ -96,12 +100,16 @@ module.exports.getOne = async (req, res) => {
                       }
 
                   } catch (e) {
-                      throw e;
+                      res.status(400).json({
+                        message: `Error: ${String(e)}`
+                      });
                   }                       
               }
             });            
         } else {
-            res.sendStatus(501);
+            res.status(400).json({
+              message: 'Params not a Number'
+            });
         }
     };
     
