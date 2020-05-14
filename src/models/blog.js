@@ -1,5 +1,10 @@
+//подключаем мангуста и устанавливаем схему
+const mongo = require("mongoose");
+const Schema = mongo.Schema;
+
+
 //установка модели блога
-const blogSchema = {
+const blogModel = new Schema ({
     id: {
         type: Number,
         required: true,
@@ -15,11 +20,9 @@ const blogSchema = {
         required: true,
         default: 'Empty text'
     },
-};
+});
 
-//подключаем мангуста и устанавливаем схему
-const mongo = require("mongoose");
-const Schema = mongo.Schema;
+
 
 //экспорт модели
-module.exports = mongo.model("Blog", new Schema(blogSchema));
+module.exports = mongo.model("Blog", blogModel);

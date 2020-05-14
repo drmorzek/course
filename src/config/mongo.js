@@ -12,13 +12,12 @@ mongo.set('useCreateIndex', true)
 
 
 //экспортируем функцию для работы с коллекциями
-module.exports = () => {
+module.exports = () => 
     mongo.connect(mongoUrl).then(
       () => {
-        console.log("Соединение с базой данных успешно");
+        console.log("Подключение к MongoDB успешно");
       },
       (err) => {
         console.log(err);
       }
     );
-};

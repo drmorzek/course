@@ -21,8 +21,10 @@ app.use(bodyparser.urlencoded({
 //установки роутов
 app.use("/blog", blogsRouter);
 
-//запуск сервера на прослушку порта 
-app.listen(port, () => {
-    require("./config/mongo")(); //подключение к БД
-    console.log(`Сервер запустился на порту ${port}...`);
-});
+//подключение к БД и запуск сервера на прослушку порта 
+require("./config/mongo")()
+    .then(()=>{
+        app.listen(port, () => {
+            console.log(`Сервер запустился на порту ${port}...`);
+        });
+    });

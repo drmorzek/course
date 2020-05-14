@@ -5,8 +5,8 @@ const redis = require("redis");
 const redis_params = {
   host: process.env.REDIS_HOST || "localhost",
   port: process.env.REDIS_PORT || 6379,
-  detect_buffers: false,
-  // expire: 1
+  // password: process.env.REDIS_PASSWORD || null,
+  detect_buffers: false
 };
 
 //создание клиента редиски

@@ -1,5 +1,5 @@
 //подключаем модель блогов
-const blogs = require("../models/blog");
+const Blogs = require("../models/blog");
 
 //импорт редиски для кеширования
 const redis = require("../config/redis");
@@ -10,64 +10,96 @@ const expire = 60;
 //колбек функции для блогов
 //============================
 //получить все блоги
-const getAll = async (req, res) => {
-    await blogs
-        .find()
-        .exec((err, data) => {
-            if (err) throw err;
-            if (data.length !== 0 ) {
-                data.forEach((value, index) =>{
+module.exports.getAll = async (req, res) => {
+
+              try {
+                const blog = await Blogs.find({});
+                if (!blog) {
+                  
+                  // сервер возвращает 400 - если блоги не найдены
+                  res.status(400).json({
+                    message: 'Blogs not found'
+                  });
+
+                } else {
+                  //сохраняем полученные данные в редис
+                  blog.forEach((value, index) => {
                     console.log("В Redis записано ", String(value));
-                    redis.set(
-                      "blog_"+String(value.id),
-                      JSON.stringify(value),
-                      "EX", expire
-                    );
-                });                
-                res.status(200).send(data);
-            } else {
-                res.sendStatus(501);
-            }
-        });
-    };
+                    redis.set("blog_" + String(value.id), 
+                    JSON.stringify(value), 
+                    "EX", expire);
+                  });
+
+                  // сервер возвращает 201 - если все ок
+                  res.status(201).json({
+                    data: blog
+                  });
+                }
+
+              } catch (e) {
+                throw e;
+              }
+  };
+
+
+
 
 //получить блог по id
-const getOne = async (req, res) => {        
+module.exports.getOne = async (req, res) => {
+        //проверка передаваемых get параметров на число(опциональная)  
         if (!isNaN(Number(req.params.id))) {
-           await redis.get("blog_"+req.params.id, (err, res_cache) => {
-              if (err) res.status(501).send(err);
-              if (res_cache) {
-                console.log("Взято из Redis ", JSON.parse(res_cache));
-                res.status(200).send(JSON.parse(res_cache));
+
+            await redis.get("blog_" + req.params.id,async (err, blog_cache) =>{
+
+              // 400 - если ошибка в редис
+              if (err) res.status(400).json({
+                message: 'Blogs not found'
+              });
+
+              if (blog_cache) {
+
+                // сервер возвращает 201 - если в редис сохранился блог
+                console.log("Взято из Redis ", JSON.parse(blog_cache));
+                res.status(201).json({
+                  data: JSON.parse(blog_cache)
+                });
+
               } else {
-                blogs
-                  .find({
-                    id: Number(req.params.id),
-                  })
-                  .exec((err, data) => {
-                    if (err) res.status(501).send(err);
-                    if (data.length !== 0) {
-                      console.log("Взято из БД ", data);
-                      redis.set(
-                        "blog_"+String(req.params.id),
-                        JSON.stringify(data),
-                        "EX", expire
-                      );                      
-                      res.status(200).send(data);
-                    } else {
-                      res.sendStatus(501);
-                    }
-                  });
+                  try {
+
+                      //если в редис нет - ищем в монго
+                      const blog = await Blogs.find({
+                        id: Number(req.params.id),
+                      });
+                      if (!blog) {
+
+                        // сервер возвращает 400 - если блог в монго не найден
+                        res.status(400).json({
+                          message: 'Blogs not found'
+                        });
+
+                      } else {
+
+                        //кешируем в редис если блог в базе найден
+                        await redis.set(
+                          "blog_" + String(req.params.id),
+                          JSON.stringify(blog),
+                          "EX", expire
+                        );
+
+                        // сервер возвращает 201 - если все ок
+                        res.status(201).json({
+                          data: blog
+                        });
+                      }
+
+                  } catch (e) {
+                      throw e;
+                  }                       
               }
-            });
-            
+            });            
         } else {
             res.sendStatus(501);
         }
     };
     
-
-module.exports = {
-    getAll,
-    getOne
-};
