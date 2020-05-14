@@ -15,7 +15,7 @@ module.exports.getAll = async (req, res) => {
               try {
                 const blog = await Blogs.find({});
                 if (!blog) {
-                  
+
                   // сервер возвращает 400 - если блоги не найдены
                   res.status(400).json({
                     message: 'Blogs not found'
@@ -57,9 +57,10 @@ module.exports.getOne = async (req, res) => {
               });
 
               if (blog_cache) {
+                //для проверки в консоли
+                console.log("Взято из Redis ", JSON.parse(blog_cache));
 
                 // сервер возвращает 201 - если в редис сохранился блог
-                console.log("Взято из Redis ", JSON.parse(blog_cache));
                 res.status(201).json({
                   data: JSON.parse(blog_cache)
                 });
@@ -75,11 +76,12 @@ module.exports.getOne = async (req, res) => {
 
                         // сервер возвращает 400 - если блог в монго не найден
                         res.status(400).json({
-                          message: 'Blogs not found'
+                          message: 'Blogs not found in MongoDB'
                         });
 
                       } else {
-
+                        //для проверки в консоли
+                        console.log("Взято из MongoDB ", blog);
                         //кешируем в редис если блог в базе найден
                         await redis.set(
                           "blog_" + String(req.params.id),
