@@ -1,5 +1,5 @@
 //подключение библиотеки редиски
-const redis = require("redis");
+const redis = require("async-redis");
 
 //параметры клиента
 const redis_params = {

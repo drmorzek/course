@@ -18,7 +18,7 @@ module.exports.getAll = async (req, res) => {
 
                   // сервер возвращает 400 - если блоги не найдены
                   res.status(400).json({
-                    message: 'Blogs not found'
+                    message: 'Blogs not found from MongoDB'
                   });
 
                 } else {
@@ -45,71 +45,73 @@ module.exports.getAll = async (req, res) => {
               }
   };
 
-
-
-
 //получить блог по id
 module.exports.getOne = async (req, res) => {
         //проверка передаваемых get параметров на число(опциональная)  
-        if (!isNaN(Number(req.params.id))) {
+        if (isNaN(Number(req.params.id))) {
+          //если передаваемый параметр не является числом, то сервер возвращает 400 с ошибкой
+          res.status(400).json({
+            message: 'Params not a Number'
+          });
 
-            await redis.get("blog_" + req.params.id,async (err, blog_cache) =>{
+          //иначе если всё ништяк
+          } else {
 
-              // 400 - если ошибка в редис
-              if (err) res.status(400).json({
-                message: `Error from Redis: ${String(err)}`
+            try {
+                //ищем блог в кеше
+                const blogFromRedis = await redis.get("blog_" + req.params.id);
+
+                //если в кеше блога есть
+                if (blogFromRedis) {
+                  //для проверки в консоли
+                  console.log("Взято из Redis ", JSON.parse(blogFromRedis));
+
+                  // сервер возвращает 201 - если в редис сохранился блог
+                  res.status(201).json({
+                    data: JSON.parse(blogFromRedis)
+                  });
+
+                  //если в кеше блога нет, то..
+                } else {
+                  //ищем блог в базе монго
+                  const blogFromMongo = await Blogs.find({
+                    id: Number(req.params.id),
+                  });
+
+                  //если блог и в монго не найден
+                  if (blogFromMongo.length === 0) {
+
+                    //для проверки в консоли
+                    console.log('Blogs not found in MongoDB and Redis');
+
+                    // сервер возвращает 400 - если блог в монго не найден
+                    res.status(400).json({
+                      message: 'Blogs not found in MongoDB and Redis'
+                    });
+
+                    //иначе, если блог в базе найден, то...
+                  } else {
+                    //для проверки в консоли
+                    console.log("Взято из MongoDB ", blogFromMongo);
+
+                    //кешируем в редис если блог в базе найден
+                    await redis.set(
+                      "blog_" + String(req.params.id),
+                      JSON.stringify(blogFromMongo),
+                      "EX", expire
+                    );
+                    // сервер возвращает 201 - если все ок
+                    res.status(201).json({
+                      data: blogFromMongo
+                    });
+                  }
+                }
+            } catch (e) {
+              res.status(400).json({
+                message: `Error: ${String(e)}`
               });
-
-              if (blog_cache) {
-                //для проверки в консоли
-                console.log("Взято из Redis ", JSON.parse(blog_cache));
-
-                // сервер возвращает 201 - если в редис сохранился блог
-                res.status(201).json({
-                  data: JSON.parse(blog_cache)
-                });
-
-              } else {
-                  try {
-
-                      //если в редис нет - ищем в монго
-                      const blog = await Blogs.find({
-                        id: Number(req.params.id),
-                      });
-                      if (!blog) {
-
-                        // сервер возвращает 400 - если блог в монго не найден
-                        res.status(400).json({
-                          message: 'Blogs not found in MongoDB'
-                        });
-
-                      } else {
-                        //для проверки в консоли
-                        console.log("Взято из MongoDB ", blog);
-                        //кешируем в редис если блог в базе найден
-                        await redis.set(
-                          "blog_" + String(req.params.id),
-                          JSON.stringify(blog),
-                          "EX", expire
-                        );
-
-                        // сервер возвращает 201 - если все ок
-                        res.status(201).json({
-                          data: blog
-                        });
-                      }
-
-                  } catch (e) {
-                      res.status(400).json({
-                        message: `Error: ${String(e)}`
-                      });
-                  }                       
-              }
-            });            
-        } else {
-            res.status(400).json({
-              message: 'Params not a Number'
-            });
+            }  
+            
         }
     };
     
