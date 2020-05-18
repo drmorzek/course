@@ -2,6 +2,7 @@
 bin-debug/
 bin-release/
 task2/node_modules/
+node_modules/
 [Oo]bj/
 [Bb]in/
 
