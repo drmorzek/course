@@ -3,7 +3,7 @@ require("dotenv").config();
 const express  = require("express");
 const bodyparser = require("body-parser");
 
-
+const upload = require('./helpers/multer');
 
 //установка константы значения порта
 const port = process.env.PORT || 3000;
@@ -18,10 +18,12 @@ app.use(bodyparser.urlencoded({
 }));
 
 //установки роутов
-app.use("/blogs", blogsRouter);
+app.post('/user', upload.none(), function (req, res, next) {
+    next();
+});
 
 //подключение к БД и запуск сервера на прослушку порта 
-require("./config/mongo")()
+require("./helpers/mongo")()
     .then(()=>{
         app.listen(port, () => {
             console.log(`Сервер запустился на порту ${port}...`);
