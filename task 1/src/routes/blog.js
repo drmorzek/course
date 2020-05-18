@@ -6,7 +6,7 @@ const blogsController = require("../controllers/blog");
 const blogsRouter = express.Router();
 
 //устанавливаем роуты для блога
-blogsRouter.get("/all", blogsController.getAll);
+blogsRouter.get("/", blogsController.getAll);
 blogsRouter.get("/:id", blogsController.getOne);
 
 //експортируем blogsRouter

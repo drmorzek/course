@@ -1,7 +1,7 @@
 # Build and Release Folders
 bin-debug/
 bin-release/
-src/node_modules/
+task2/node_modules/
 [Oo]bj/
 [Bb]in/
 

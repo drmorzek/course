@@ -19,7 +19,7 @@ app.use(bodyparser.urlencoded({
 }));
 
 //установки роутов
-app.use("/blog", blogsRouter);
+app.use("/blogs", blogsRouter);
 
 //подключение к БД и запуск сервера на прослушку порта 
 require("./config/mongo")()
