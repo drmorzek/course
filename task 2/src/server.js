@@ -3,7 +3,7 @@ require("dotenv").config();
 const express  = require("express");
 const bodyparser = require("body-parser");
 
-const upload = require('./helpers/multer');
+const {getConfiguredMulter} = require('./helpers/multer');
 
 //установка константы значения порта
 const port = process.env.PORT || 3000;
@@ -17,8 +17,9 @@ app.use(bodyparser.urlencoded({
     extended: true
 }));
 
+// console.log(getConfiguredMulter("../uploads"));
 //установки роутов
-app.post('/file', upload("../uploads"), function (req, res, next) {
+app.post('/file', getConfiguredMulter("../uploads", "file"), function (req, res, next) {
     next();
 });
 
