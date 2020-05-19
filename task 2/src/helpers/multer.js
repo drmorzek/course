@@ -16,7 +16,7 @@ const getMulterConfig = (changeFolder, extList = undefined) => {
   };
   if (extList) {
     multerConfig.fileFilter = function (req, file, cb) {
-      if (!extList.includes(mime.extension(file.mimetype))) {
+      if (!extList.includes(mime.getExtension(file.mimetype))) {
         return cb(
           new Error(
             `File extension not allowed. Allowed formats: ${extList.toString()}`
@@ -35,7 +35,7 @@ const getMulterStorageConfig = (changeFolder) => {
             cb(null, changeFolder);
         },
         filename: (req, file, cb) => {
-            cb(null, `${uuid.v4()}.${mime.extension(file.mimetype)}`);
+            cb(null, `${uuid.v4()}.${mime.getExtension(file.mimetype)}`);
         },
     });
 };
