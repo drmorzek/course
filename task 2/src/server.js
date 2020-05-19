@@ -19,8 +19,8 @@ app.use(bodyparser.urlencoded({
 
 //установки роутов
 app.post('/file', upload.single("file"), function (req, res, next) {
-    console.log(req.file)
-    next();
+    console.log(req.file);
+    res.status(200).json({data: req.file});
 });
 
 //подключение к БД и запуск сервера на прослушку порта 
