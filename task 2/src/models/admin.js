@@ -68,7 +68,7 @@ AdminModel.pre("save", function (next) {
 
 //метод проверки имени name
 AdminModel.methods.checkName = function(name, cb){
-    return this.find({ name: new RegExp(name, "i") }, cb);
+    return this.model("Admin").find({ name: new RegExp(name, "i") }, cb);
 };
 
 
