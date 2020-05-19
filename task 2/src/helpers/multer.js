@@ -1,17 +1,46 @@
 const multer = require('multer');
-
-var storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, '../../uploads')
-    },
-    filename: function (req, file, cb) {
-        cb(null, file.fieldname + '-' + Date.now())
-    }
-})
+const uuid = require('uuid');
+const mime = require('mime');
 
 
-var upload = multer({
-    storage: storage
-});
+const getConfiguredMulter = (changeFolder, extList = undefined ) => {
+        let multerConfig = getMulterConfig(changeFolder, extList);
+        return multer(multerConfig);
+};
 
-module.exports = upload;
+const getMulterConfig = (changeFolder, extList = undefined) => {
+  const storage = getMulterStorageConfig(changeFolder);
+  const multerConfig = {
+    storage: storage,
+    dest: changeFolder,
+  };
+  if (extList) {
+    multerConfig.fileFilter = function (req, file, cb) {
+      if (!extList.includes(mime.extension(file.mimetype))) {
+        return cb(
+          new Error(
+            `File extension not allowed. Allowed formats: ${extList.toString()}`
+          )
+        );
+      }
+      return cb(null, true);
+    };
+  }
+  return multerConfig;
+};
+
+const getMulterStorageConfig = (changeFolder) => {
+    return multer.diskStorage({
+        destination: (req, file, cb) => {
+            cb(null, changeFolder);
+        },
+        filename: (req, file, cb) => {
+            cb(null, `${uuid.v4()}.${mime.extension(file.mimetype)}`);
+        },
+    });
+};
+
+
+module.exports = {
+    getConfiguredMulter
+};

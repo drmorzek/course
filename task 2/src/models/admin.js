@@ -70,7 +70,11 @@ AdminModel.pre("save", function (next) {
 AdminModel.methods.checkName = function(name, cb){
     let checkName =  this.model("Admin").find({ name: String(name) });
     if (!checkName[0].name) {
-        cb(true);
+        cb(
+          new Error(
+            `${name.toString()} is not found from DB`
+          )
+        );
     } else {
         cb(null, checkName);
     }

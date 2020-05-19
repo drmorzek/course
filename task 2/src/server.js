@@ -18,7 +18,7 @@ app.use(bodyparser.urlencoded({
 }));
 
 //установки роутов
-app.post('/user', upload.none(), function (req, res, next) {
+app.post('/file', upload("../uploads"), function (req, res, next) {
     next();
 });
 
