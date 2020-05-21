@@ -26,7 +26,8 @@ app.post('/file', upload.single("file"), function (req, res, next) {
 //подключение к БД и запуск сервера на прослушку порта 
 require("./helpers/mongo")()
     .then(()=>{
-        app.listen(port, () => {
+        app.listen(port, () => {           
             console.log(`Сервер запустился на порту ${port}...`);
+            console.log(`Worker cluster started. Pid: ${process.pid}`)
         });
     });
